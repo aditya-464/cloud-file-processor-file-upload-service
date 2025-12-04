@@ -1,14 +1,12 @@
 package com.example.cloud.file.processor.file_upload_service.controller;
 
+import com.example.cloud.file.processor.file_upload_service.exception.NoFileException;
 import com.example.cloud.file.processor.file_upload_service.model.FileUpload;
 import com.example.cloud.file.processor.file_upload_service.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -22,14 +20,17 @@ public class FileUploadController {
         this.fileStorageService = fileStorageService;
     }
 
+    @GetMapping("/welcome")
+    public String welcome(){
+        return "Jai Shree Radha!";
+    }
+
     @PostMapping("/upload")
-    public ResponseEntity<FileUpload> uploadFile(@RequestParam("file")MultipartFile file){
-        try{
-            FileUpload fileUpload = fileStorageService.upload(file);
-            return new ResponseEntity<>(fileUpload, HttpStatus.OK);
+    public ResponseEntity<FileUpload> uploadFile(@RequestParam("file")MultipartFile file) throws Exception{
+        if(file.isEmpty()){
+            throw new NoFileException("No file selected");
         }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        FileUpload fileUpload = fileStorageService.upload(file);
+        return new ResponseEntity<>(fileUpload, HttpStatus.OK);
     }
 }
