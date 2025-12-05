@@ -21,7 +21,7 @@ public class FileUpload {
     private Long id;
 
     private String originalName;
-    private String s3Url;
+    private String s3Key;
     private String status;
     private Long size;
 }

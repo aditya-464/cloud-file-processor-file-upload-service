@@ -30,6 +30,6 @@ public class S3Service {
 
         s3Client.putObject(putObj, filePath);
 
-        return "https://s3.amazonaws.com/" + bucketName + "/" + key;
+        return key;
     }
 }

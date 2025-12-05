@@ -25,18 +25,27 @@ public class FileStorageService {
         file.transferTo(tempFile.toFile());
 
         // Upload to S3
-        String s3Url = s3Service.uploadFile(tempFile, file.getContentType());
+        String s3Key = s3Service.uploadFile(tempFile, file.getContentType());
 
         // Save metadata to DB
         FileUpload uploaded = FileUpload.builder()
                 .originalName(file.getOriginalFilename())
-                .s3Url(s3Url)
+                .s3Key(s3Key)
                 .size(file.getSize())
                 .status("UPLOADED")
                 .build();
 
         FileUpload saved = fileUploadRepository.save(uploaded);
-        fileUploadTopic.sendMessage("{ \"fileId\": " + saved.getId() + ", \"s3Url\": \"" + s3Url + "\" }");
+//        fileUploadTopic.sendMessage("{ \"fileId\": " + saved.getId() + ", \"s3Key\": \"" + s3Key + "\" }");
+
+        String message = "{"
+                + "\"fileId\": " + saved.getId() + ","
+                + "\"s3Key\": \"" + s3Key + "\","
+                + "\"fileName\": \"" + saved.getOriginalName() + "\","
+                + "\"contentType\": \"" + file.getContentType() + "\""
+                + "}";
+
+        fileUploadTopic.sendMessage(message);
 
         return saved;
     }
